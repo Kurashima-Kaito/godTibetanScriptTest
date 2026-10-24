@@ -189,12 +189,12 @@
       if(currentAnswer.length > 0 && currentAnswer[0].slice(-1) === "á") tone = 1
       currentAnswer = currentAnswer.map(e => e.slice(0, -1))
       
-      let vowelType = "0000"
+      let vowelType = "0000" //isNasal, isLong, isFront, isLowered
       let lastConsAnswer = ""
       
       switch(lastConsIndex){
         case 1: vowelType = "0101"; break;  //ག
-        case 2: vowelType = "1000"; break;  //ང
+        case 2: vowelType = "1101"; break;  //ང
         case 3: vowelType = "0001"; lastConsAnswer = "p"; break;  //བ
         case 4: vowelType = "0000"; lastConsAnswer = "m"; break;  //མ
         case 5: vowelType = "0000"; break;  //འ
