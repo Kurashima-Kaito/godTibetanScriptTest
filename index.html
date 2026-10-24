@@ -41,17 +41,24 @@
       display: flex;
     }
     h1 {
-      font-size: 2.5rem;
+      font-size: 2.3rem;
       line-height: 1.4;
       white-space: pre-line;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 80%;
+      max-width: 300px;
     }
     .btn {
       background: #646464;
       color: #FFF;
       border: 5px solid #282828;
-      padding: 15px 30px;
-      font-size: 1.5rem;
+      padding: 15px 20px;
+      font-size: 1.2rem;
       cursor: pointer;
       font-weight: bold;
       border-radius: 4px;
@@ -61,8 +68,12 @@
       background: #505050;
     }
     .tibetan-display {
-      font-size: 5rem;
+      font-size: 3.5rem;
       margin: 20px 0;
+      word-break: break-all;
+    }
+    .orange-text {
+      color: #FFB74D;
     }
     .history-box {
       text-align: left;
@@ -86,7 +97,7 @@
       height: 80px;
       background: #404040;
       color: #FFFFFF;
-      font-size: 2rem;
+      font-size: 1.8rem;
       border: none;
       padding: 10px;
       box-sizing: border-box;
@@ -105,14 +116,17 @@
     <!-- タイトル画面 -->
     <div id="title-screen" class="screen active">
       <h1>Apprenons<br>tibétaines<br>prononciations.</h1>
-      <button class="btn" id="start-btn">Commence</button>
+      <div class="btn-container">
+        <button class="btn" id="start-1-btn">1音節モード</button>
+        <button class="btn" id="start-3-btn">3音節モード</button>
+      </div>
     </div>
 
     <!-- ゲーム画面 -->
     <div id="game-screen" class="screen">
       <div class="hints">x:＼ q:／ z:ᐱ</div>
       <div>
-        <div style="font-size: 1.5rem;">Qu'est-ce la prononciation de</div>
+        <div style="font-size: 1.3rem;">Qu'est-ce la prononciation de</div>
         <div class="tibetan-display" id="tibetan-char"></div>
       </div>
       
@@ -131,14 +145,12 @@
   <script>
     let tibetans = []
     let lastCons = ["","ག","ང","བ","མ","འ","ར","ད","ན","ལ","ས","གས","ངས","བས","མས"]
-    let lastConsIndex = 0
-    let lastConsLetter = ""
-    let currentLetter = ""
-    let currentAnswer = []
-    let prevAnswer = []
+    let mode = 1 // 1 または 3
+    
+    let currentSyllables = []
+    let prevSyllables = []
+    let prevAnswerStr = ""
     let prevUserAnswer = ""
-    let prevLetter = ""
-    let prevLastConsLetter = ""
 
     async function initGame() {
       let tibetans_raw = []
@@ -163,27 +175,21 @@
       }
     }
 
-    function nextQues(){
-      prevLetter = currentLetter
-      prevAnswer = [...currentAnswer]
-      prevLastConsLetter = lastConsLetter
-      
-      lastConsIndex = Math.floor(Math.random() * lastCons.length)
-      lastConsLetter = lastCons[lastConsIndex]
+    function generateSingleSyllable() {
+      let lastConsIndex = Math.floor(Math.random() * lastCons.length)
+      let lastConsLetter = lastCons[lastConsIndex]
       
       let validTibetans = tibetans.filter(t => t && t.length > 0)
-      if (validTibetans.length > 0) {
-        let temp = validTibetans[Math.floor(Math.random() * validTibetans.length)]
-        let currentTibetan = temp[Math.floor(Math.random() * temp.length)]
-        currentLetter = currentTibetan.letter
-        currentAnswer = [...currentTibetan.pro]
-      }
+      let temp = validTibetans[Math.floor(Math.random() * validTibetans.length)]
+      let currentTibetan = temp[Math.floor(Math.random() * temp.length)]
+      let currentLetter = currentTibetan.letter
+      let currentAnswer = [...currentTibetan.pro]
       
       let tone = 0
       if(currentAnswer.length > 0 && currentAnswer[0].slice(-1) === "á") tone = 1
       currentAnswer = currentAnswer.map(e => e.slice(0, -1))
       
-      let vowelType = "0000"  // isNasal, isLong, isFront, isLowered
+      let vowelType = "0000"
       let lastConsAnswer = ""
       
       switch(lastConsIndex){
@@ -204,39 +210,63 @@
       }
       
       let vowel = "a"
-      
       if(vowelType == "0000" && tone == 0){  vowel = "a"}
-      if(vowelType == "0000" && tone == 1){  vowel = "a"; lastConsAnswer += "q"}
-      if(vowelType == "1000" && tone == 0){  vowel = "an"}
-      if(vowelType == "1000" && tone == 1){  vowel = "an"; lastConsAnswer += "q"}
-      if(vowelType == "0100" && tone == 0){  vowel = "aa"}
-      if(vowelType == "0100" && tone == 1){  vowel = "aa"; lastConsAnswer += "q"}
-      if(vowelType == "0001" && tone == 0){  vowel = "a"; lastConsAnswer += "x"}
-      if(vowelType == "0001" && tone == 1){  vowel = "a"; lastConsAnswer += "z"}
-      if(vowelType == "0101" && tone == 0){  vowel = "aa"; lastConsAnswer += "x"}
-      if(vowelType == "0101" && tone == 1){  vowel = "aa"; lastConsAnswer += "z"}
-      if(vowelType == "1001" && tone == 0){  vowel = "an"; lastConsAnswer += "x"}
-      if(vowelType == "1001" && tone == 1){  vowel = "an"; lastConsAnswer += "z"}
-      if(vowelType == "0110" && tone == 0){  vowel = "ää"}
-      if(vowelType == "0110" && tone == 1){  vowel = "ää"; lastConsAnswer += "q"}
-      if(vowelType == "1010" && tone == 0){  vowel = "än"}
-      if(vowelType == "1010" && tone == 1){  vowel = "än"; lastConsAnswer += "q"}
-      if(vowelType == "0011" && tone == 0){  vowel = "ä"; lastConsAnswer += "x"}
-      if(vowelType == "0011" && tone == 1){  vowel = "ä"; lastConsAnswer += "z"}
-      if(vowelType == "0111" && tone == 0){  vowel = "ää"; lastConsAnswer += "x"}
-      if(vowelType == "0111" && tone == 1){  vowel = "ää"; lastConsAnswer += "z"}
+      else if(vowelType == "0000" && tone == 1){  vowel = "a"; lastConsAnswer += "q"}
+      else if(vowelType == "1000" && tone == 0){  vowel = "an"}
+      else if(vowelType == "1000" && tone == 1){  vowel = "an"; lastConsAnswer += "q"}
+      else if(vowelType == "0100" && tone == 0){  vowel = "aa"}
+      else if(vowelType == "0100" && tone == 1){  vowel = "aa"; lastConsAnswer += "q"}
+      else if(vowelType == "0001" && tone == 0){  vowel = "a"; lastConsAnswer += "x"}
+      else if(vowelType == "0001" && tone == 1){  vowel = "a"; lastConsAnswer += "z"}
+      else if(vowelType == "0101" && tone == 0){  vowel = "aa"; lastConsAnswer += "x"}
+      else if(vowelType == "0101" && tone == 1){  vowel = "aa"; lastConsAnswer += "z"}
+      else if(vowelType == "1001" && tone == 0){  vowel = "an"; lastConsAnswer += "x"}
+      else if(vowelType == "1001" && tone == 1){  vowel = "an"; lastConsAnswer += "z"}
+      else if(vowelType == "0110" && tone == 0){  vowel = "ää"}
+      else if(vowelType == "0110" && tone == 1){  vowel = "ää"; lastConsAnswer += "q"}
+      else if(vowelType == "1010" && tone == 0){  vowel = "än"}
+      else if(vowelType == "1010" && tone == 1){  vowel = "än"; lastConsAnswer += "q"}
+      else if(vowelType == "0011" && tone == 0){  vowel = "ä"; lastConsAnswer += "x"}
+      else if(vowelType == "0011" && tone == 1){  vowel = "ä"; lastConsAnswer += "z"}
+      else if(vowelType == "0111" && tone == 0){  vowel = "ää"; lastConsAnswer += "x"}
+      else if(vowelType == "0111" && tone == 1){  vowel = "ää"; lastConsAnswer += "z"}
       
       currentAnswer = currentAnswer.map(e => e + vowel + lastConsAnswer)
+      
+      return {
+        letter: currentLetter,
+        lastCons: lastConsLetter,
+        pro: currentAnswer
+      }
+    }
+
+    function nextQues(){
+      prevSyllables = [...currentSyllables]
+      prevAnswerStr = prevSyllables.map(s => s.pro[0]).join(" ")
+      
+      currentSyllables = []
+      let count = (mode === 3) ? 3 : 1
+      for(let i = 0; i < count; i++){
+        currentSyllables.push(generateSingleSyllable())
+      }
+      
       updateScreen()
     }
 
+    function renderDisplay(syllables) {
+      if (!syllables || syllables.length === 0) return ""
+      return syllables.map(s => `${s.letter}<span class="orange-text">${s.lastCons}</span>`).join("་") + "་"
+    }
+
     function updateScreen() {
-      document.getElementById("tibetan-char").innerText = currentLetter + " " + lastConsLetter + "་"
-      document.getElementById("history-utkoman").innerText = "Útkoman: " + prevAnswer.join(" ") + " (" + prevLetter + " " + prevLastConsLetter + ")"
+      document.getElementById("tibetan-char").innerHTML = renderDisplay(currentSyllables)
+      
+      let prevText = prevSyllables.length > 0 ? prevSyllables.map(s => `${s.letter}${s.lastCons}`).join(" ") : "-"
+      document.getElementById("history-utkoman").innerText = "Útkoman: " + prevAnswerStr + (prevText !== "-" ? " (" + prevText + ")" : "")
       document.getElementById("history-svarid").innerText = "Svarið: " + prevUserAnswer
       
       let statusEl = document.getElementById("history-status")
-      if(prevAnswer.join(" ") === prevUserAnswer && prevUserAnswer !== ""){
+      if(prevAnswerStr !== "" && prevAnswerStr === prevUserAnswer){
         statusEl.innerText = "Aðstæðurnar: Réttur"
         statusEl.className = "result-status correct"
       } else if(prevUserAnswer !== "") {
@@ -248,17 +278,21 @@
       }
     }
 
-    document.getElementById("start-btn").addEventListener("click", async () => {
+    async function startGame(selectedMode) {
+      mode = selectedMode
       await initGame()
       nextQues()
       document.getElementById("title-screen").classList.remove("active")
       document.getElementById("game-screen").classList.add("active")
-    })
+    }
+
+    document.getElementById("start-1-btn").addEventListener("click", () => startGame(1))
+    document.getElementById("start-3-btn").addEventListener("click", () => startGame(3))
 
     document.getElementById("user-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault()
-        let inputStr = e.target.value.toLowerCase().replaceAll("\n", "").trim()
+        let inputStr = e.target.value.toLowerCase().replaceAll("\n", "").trim().replace(/\s+/g, ' ')
         prevUserAnswer = inputStr
         nextQues()
         e.target.value = ""
