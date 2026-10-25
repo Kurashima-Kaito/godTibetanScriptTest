@@ -194,7 +194,7 @@
       
       switch(lastConsIndex){
         case 1: vowelType = "0101"; break;  //ག
-        case 2: vowelType = "1101"; break;  //ང
+        case 2: vowelType = "1011"; break;  //ང
         case 3: vowelType = "0001"; lastConsAnswer = "p"; break;  //བ
         case 4: vowelType = "0000"; lastConsAnswer = "m"; break;  //མ
         case 5: vowelType = "0000"; break;  //འ
@@ -218,6 +218,8 @@
       else if(vowelType == "0100" && tone == 1){  vowel = "aa"; lastConsAnswer += "q"}
       else if(vowelType == "0001" && tone == 0){  vowel = "a"; lastConsAnswer += "x"}
       else if(vowelType == "0001" && tone == 1){  vowel = "a"; lastConsAnswer += "z"}
+      else if(vowelType == "1101" && tone == 0){  vowel = "än"; lastConsAnswer += "x"}
+      else if(vowelType == "1101" && tone == 1){  vowel = "än"; lastConsAnswer += "z"}
       else if(vowelType == "0101" && tone == 0){  vowel = "aa"; lastConsAnswer += "x"}
       else if(vowelType == "0101" && tone == 1){  vowel = "aa"; lastConsAnswer += "z"}
       else if(vowelType == "1001" && tone == 0){  vowel = "an"; lastConsAnswer += "x"}
